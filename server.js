@@ -8,6 +8,16 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Production optimizations
+if (process.env.NODE_ENV === 'production') {
+  // Trust proxy for Render
+  app.set('trust proxy', 1);
+  
+  // Compress responses
+  const compression = require('compression');
+  app.use(compression());
+}
+
 // Security middleware with relaxed CSP for development
 app.use(helmet({
   contentSecurityPolicy: {
@@ -53,8 +63,19 @@ app.use(limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Static files
-app.use(express.static('public'));
+// Static files with proper headers for deployment
+app.use(express.static('public', {
+  maxAge: '1d',
+  etag: false,
+  setHeaders: (res, path) => {
+    if (path.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    }
+    if (path.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    }
+  }
+}));
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI)
@@ -68,8 +89,34 @@ app.use('/api/announcements', require('./routes/announcements'));
 app.use('/api/forums', require('./routes/forums'));
 app.use('/api/chatbot', require('./routes/chatbot'));
 
-// Serve main page
+// Serve main page (protected)
 app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
+});
+
+// Serve login page
+app.get('/login', (req, res) => {
+  res.sendFile(__dirname + '/public/login.html');
+});
+
+// Serve signup page  
+app.get('/signup', (req, res) => {
+  res.sendFile(__dirname + '/public/signup.html');
+});
+
+// Handle SPA routing - catch all routes and serve appropriate files
+app.get('*', (req, res) => {
+  // Don't serve index.html for API routes or static files
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ message: 'API endpoint not found' });
+  }
+  
+  // Serve static files if they exist
+  if (req.path.includes('.')) {
+    return res.status(404).send('File not found');
+  }
+  
+  // For all other routes, serve index.html (SPA behavior)
   res.sendFile(__dirname + '/public/index.html');
 });
 
