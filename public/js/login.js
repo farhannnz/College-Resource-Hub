@@ -91,8 +91,8 @@ function setupLoginSubmission() {
             console.log('Login successful:', response);
             
             // Store auth data
-            localStorage.setItem('authToken', response.token);
-            localStorage.setItem('currentUser', JSON.stringify(response.user));
+            localStorage.setItem('token', response.token);
+            localStorage.setItem('user', JSON.stringify(response.user));
             
             if (rememberMe) {
                 localStorage.setItem('rememberLogin', 'true');

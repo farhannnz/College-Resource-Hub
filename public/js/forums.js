@@ -2,14 +2,29 @@
 
 // Load forum posts
 async function loadForums() {
+    const container = document.getElementById('forumsList');
     showLoading('forumsList');
     
     try {
+        console.log('Loading forums from: /forums');
+        console.log('Full URL:', window.location.origin + '/api/forums');
+        
         const forums = await apiCall('/forums');
+        console.log('Forums loaded:', forums);
+        console.log('Number of forums:', forums ? forums.length : 0);
+        
         displayForums(forums);
         
     } catch (error) {
-        showEmptyState('forumsList', 'Failed to load forum posts. Please try again.', 'fas fa-exclamation-triangle');
+        console.error('Error loading forums:', error);
+        console.error('Error details:', error.message, error.stack);
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                <h5>Failed to load forum posts</h5>
+                <p>${error.message}</p>
+                <p class="mb-0">Please check the console for more details.</p>
+            </div>
+        `;
     }
 }
 
@@ -17,43 +32,62 @@ async function loadForums() {
 function displayForums(forums) {
     const container = document.getElementById('forumsList');
     
+    console.log('displayForums called with:', forums);
+    console.log('Is array?', Array.isArray(forums));
+    console.log('Length:', forums ? forums.length : 'null/undefined');
+    
     if (!forums || forums.length === 0) {
         showEmptyState('forumsList', 'No forum posts found. Be the first to start a discussion!', 'fas fa-comments');
         return;
     }
     
-    const forumsHtml = forums.map(forum => `
-        <div class="card forum-card mb-3" onclick="viewForumPost('${forum._id}')">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <div class="flex-grow-1">
-                        <h5 class="card-title mb-1">
-                            ${forum.isPinned ? '<i class="fas fa-thumbtack text-warning me-2"></i>' : ''}
-                            ${forum.title}
-                            ${forum.isResolved ? '<span class="resolved-badge ms-2">Resolved</span>' : ''}
-                        </h5>
-                        <div class="forum-meta mb-2">
-                            <span class="badge bg-primary me-2">${forum.category}</span>
-                            ${forum.subject ? `<span class="badge bg-secondary me-2">${forum.subject}</span>` : ''}
-                            <small class="text-muted">
-                                by ${forum.author.name} (${forum.author.role}) • ${formatDate(forum.createdAt)}
-                            </small>
+    try {
+        const forumsHtml = forums.map((forum, index) => {
+            console.log(`Processing forum ${index}:`, forum);
+            return `
+            <div class="card forum-card mb-3" onclick="viewForumPost('${forum._id}')" style="cursor: pointer;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="flex-grow-1">
+                            <h5 class="card-title mb-1">
+                                ${forum.isPinned ? '<i class="fas fa-thumbtack text-warning me-2"></i>' : ''}
+                                ${forum.title || 'Untitled'}
+                                ${forum.isResolved ? '<span class="badge bg-success ms-2">Resolved</span>' : ''}
+                            </h5>
+                            <div class="forum-meta mb-2">
+                                <span class="badge bg-primary me-2">${forum.category || 'general'}</span>
+                                ${forum.subject ? `<span class="badge bg-secondary me-2">${forum.subject}</span>` : ''}
+                                <small class="text-muted">
+                                    by ${forum.author?.name || 'Unknown'} (${forum.author?.role || 'N/A'}) • ${formatDate(forum.createdAt)}
+                                </small>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <p class="card-text text-truncate-2">${forum.content}</p>
-                
-                <div class="forum-stats">
-                    <span><i class="fas fa-eye me-1"></i>${forum.views} views</span>
-                    <span><i class="fas fa-reply me-1"></i>${forum.replies.length} replies</span>
-                    <span><i class="fas fa-heart me-1"></i>${forum.likes.length} likes</span>
+                    
+                    <p class="card-text" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${forum.content || 'No content'}</p>
+                    
+                    <div class="forum-stats">
+                        <span><i class="fas fa-eye me-1"></i>${forum.views || 0} views</span>
+                        <span><i class="fas fa-reply me-1"></i>${forum.replies?.length || 0} replies</span>
+                        <span><i class="fas fa-heart me-1"></i>${forum.likes?.length || 0} likes</span>
+                    </div>
                 </div>
             </div>
-        </div>
-    `).join('');
-    
-    container.innerHTML = forumsHtml;
+        `;
+        }).join('');
+        
+        console.log('Generated HTML length:', forumsHtml.length);
+        container.innerHTML = forumsHtml;
+        console.log('Forums displayed successfully');
+        
+    } catch (error) {
+        console.error('Error in displayForums:', error);
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                Error displaying forum posts: ${error.message}
+            </div>
+        `;
+    }
 }
 
 // Show create post modal
@@ -194,8 +228,12 @@ function viewForumPost(postId) {
 
 // Show forum post modal
 async function showForumPostModal(postId) {
+    console.log('Opening forum post:', postId);
+    
     try {
+        console.log('Fetching forum post from:', `/forums/${postId}`);
         const post = await apiCall(`/forums/${postId}`);
+        console.log('Forum post loaded:', post);
         
         const modalHtml = `
             <div class="modal fade" id="forumPostModal" tabindex="-1">
@@ -205,14 +243,14 @@ async function showForumPostModal(postId) {
                             <div class="flex-grow-1">
                                 <h5 class="modal-title">
                                     ${post.isPinned ? '<i class="fas fa-thumbtack text-warning me-2"></i>' : ''}
-                                    ${post.title}
-                                    ${post.isResolved ? '<span class="resolved-badge ms-2">Resolved</span>' : ''}
+                                    ${post.title || 'Untitled'}
+                                    ${post.isResolved ? '<span class="badge bg-success ms-2">Resolved</span>' : ''}
                                 </h5>
                                 <div class="forum-meta">
-                                    <span class="badge bg-primary me-2">${post.category}</span>
+                                    <span class="badge bg-primary me-2">${post.category || 'general'}</span>
                                     ${post.subject ? `<span class="badge bg-secondary me-2">${post.subject}</span>` : ''}
                                     <small class="text-muted">
-                                        by ${post.author.name} (${post.author.role}) • ${formatDate(post.createdAt)}
+                                        by ${post.author?.name || 'Unknown'} (${post.author?.role || 'N/A'}) • ${formatDate(post.createdAt)}
                                     </small>
                                 </div>
                             </div>
@@ -220,13 +258,13 @@ async function showForumPostModal(postId) {
                         </div>
                         <div class="modal-body">
                             <div class="mb-4">
-                                <p class="lead">${post.content}</p>
+                                <p class="lead">${post.content || 'No content'}</p>
                                 <div class="d-flex align-items-center gap-3">
                                     <button class="btn btn-sm btn-outline-primary" onclick="likePost('${post._id}')">
-                                        <i class="fas fa-heart me-1"></i>Like (${post.likes.length})
+                                        <i class="fas fa-heart me-1"></i>Like (${post.likes?.length || 0})
                                     </button>
-                                    <span class="text-muted"><i class="fas fa-eye me-1"></i>${post.views} views</span>
-                                    ${currentUser && (currentUser.id === post.author._id || currentUser.role === 'admin') ? `
+                                    <span class="text-muted"><i class="fas fa-eye me-1"></i>${post.views || 0} views</span>
+                                    ${currentUser && (currentUser.id === post.author?._id || currentUser.role === 'admin') ? `
                                         <button class="btn btn-sm btn-outline-success" onclick="toggleResolved('${post._id}', ${post.isResolved})">
                                             <i class="fas fa-check me-1"></i>
                                             Mark as ${post.isResolved ? 'Unresolved' : 'Resolved'}
@@ -237,21 +275,21 @@ async function showForumPostModal(postId) {
                             
                             <hr>
                             
-                            <h6>Replies (${post.replies.length})</h6>
+                            <h6>Replies (${post.replies?.length || 0})</h6>
                             <div id="repliesList" class="mb-4">
-                                ${post.replies.map(reply => `
+                                ${(post.replies || []).map(reply => `
                                     <div class="card mb-3">
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-start mb-2">
                                                 <div>
-                                                    <strong>${reply.author.name}</strong>
-                                                    <span class="badge bg-secondary ms-2">${reply.author.role}</span>
+                                                    <strong>${reply.author?.name || 'Unknown'}</strong>
+                                                    <span class="badge bg-secondary ms-2">${reply.author?.role || 'N/A'}</span>
                                                 </div>
                                                 <small class="text-muted">${formatDate(reply.createdAt)}</small>
                                             </div>
-                                            <p class="mb-2">${reply.content}</p>
+                                            <p class="mb-2">${reply.content || 'No content'}</p>
                                             <button class="btn btn-sm btn-outline-primary" onclick="likeReply('${post._id}', '${reply._id}')">
-                                                <i class="fas fa-heart me-1"></i>Like (${reply.likes.length})
+                                                <i class="fas fa-heart me-1"></i>Like (${reply.likes?.length || 0})
                                             </button>
                                         </div>
                                     </div>
@@ -281,7 +319,7 @@ async function showForumPostModal(postId) {
                             ` : `
                                 <div class="alert alert-info">
                                     <i class="fas fa-info-circle me-2"></i>
-                                    Please <a href="#" onclick="showLogin()">login</a> to add replies.
+                                    Please login to add replies.
                                 </div>
                             `}
                         </div>
@@ -294,10 +332,21 @@ async function showForumPostModal(postId) {
         const modal = new bootstrap.Modal(document.getElementById('forumPostModal'));
         modal.show();
         
+        console.log('Forum post modal displayed successfully');
+        
     } catch (error) {
-        showAlert('error', 'Failed to load forum post');
+        console.error('Error loading forum post:', error);
+        console.error('Error details:', error.message, error.stack);
+        showAlert('error', `Failed to load forum post: ${error.message}`);
     }
 }
+                                                    <strong>${reply.author.name}</strong>
+                                                    <span class="badge bg-secondary ms-2">${reply.author.role}</span>
+                                                </div>
+                                                <small class="text-muted">${formatDate(reply.createdAt)}</small>
+                                            </div>
+                                            <p class="mb-2">${reply.content}</p>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="likeReply('${post._id}', '${reply._id}')">
 
 // Handle add reply
 async function handleAddReply(postId) {

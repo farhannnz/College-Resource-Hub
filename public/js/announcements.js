@@ -2,6 +2,7 @@
 
 // Load announcements
 async function loadAnnouncements() {
+    const container = document.getElementById('announcementsList');
     showLoading('announcementsList');
     
     try {
@@ -15,11 +16,25 @@ async function loadAnnouncements() {
         const queryString = params.toString();
         const endpoint = queryString ? `/announcements?${queryString}` : '/announcements';
         
+        console.log('Loading announcements from:', endpoint);
+        console.log('Full URL:', window.location.origin + '/api' + endpoint);
+        
         const announcements = await apiCall(endpoint);
+        console.log('Announcements loaded:', announcements);
+        console.log('Number of announcements:', announcements ? announcements.length : 0);
+        
         displayAnnouncements(announcements);
         
     } catch (error) {
-        showEmptyState('announcementsList', 'Failed to load announcements. Please try again.', 'fas fa-exclamation-triangle');
+        console.error('Error loading announcements:', error);
+        console.error('Error details:', error.message, error.stack);
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                <h5>Failed to load announcements</h5>
+                <p>${error.message}</p>
+                <p class="mb-0">Please check the console for more details.</p>
+            </div>
+        `;
     }
 }
 
@@ -27,59 +42,78 @@ async function loadAnnouncements() {
 function displayAnnouncements(announcements) {
     const container = document.getElementById('announcementsList');
     
+    console.log('displayAnnouncements called with:', announcements);
+    console.log('Is array?', Array.isArray(announcements));
+    console.log('Length:', announcements ? announcements.length : 'null/undefined');
+    
     if (!announcements || announcements.length === 0) {
         showEmptyState('announcementsList', 'No announcements found. Try adjusting your filters.', 'fas fa-bullhorn');
         return;
     }
     
-    const announcementsHtml = announcements.map(announcement => `
-        <div class="card announcement-card priority-${announcement.priority} mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <h5 class="card-title mb-0">${announcement.title}</h5>
-                    <span class="badge bg-${getPriorityColor(announcement.priority)} priority-badge ms-2">
-                        ${announcement.priority.toUpperCase()}
-                    </span>
+    try {
+        const announcementsHtml = announcements.map((announcement, index) => {
+            console.log(`Processing announcement ${index}:`, announcement);
+            return `
+            <div class="card announcement-card priority-${announcement.priority || 'medium'} mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <h5 class="card-title mb-0">${announcement.title || 'Untitled'}</h5>
+                        <span class="badge bg-${getPriorityColor(announcement.priority || 'medium')} priority-badge ms-2">
+                            ${(announcement.priority || 'medium').toUpperCase()}
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-secondary me-2">${announcement.category || 'general'}</span>
+                        ${currentUser && (currentUser.role === 'admin' || announcement.createdBy?._id === currentUser.id) ? `
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="editAnnouncement('${announcement._id}')">
+                                        <i class="fas fa-edit me-2"></i>Edit
+                                    </a></li>
+                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteAnnouncement('${announcement._id}')">
+                                        <i class="fas fa-trash me-2"></i>Delete
+                                    </a></li>
+                                </ul>
+                            </div>
+                        ` : ''}
+                    </div>
                 </div>
-                <div class="d-flex align-items-center">
-                    <span class="badge bg-secondary me-2">${announcement.category}</span>
-                    ${currentUser && (currentUser.role === 'admin' || announcement.createdBy._id === currentUser.id) ? `
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#" onclick="editAnnouncement('${announcement._id}')">
-                                    <i class="fas fa-edit me-2"></i>Edit
-                                </a></li>
-                                <li><a class="dropdown-item text-danger" href="#" onclick="deleteAnnouncement('${announcement._id}')">
-                                    <i class="fas fa-trash me-2"></i>Delete
-                                </a></li>
-                            </ul>
+                <div class="card-body">
+                    <p class="card-text">${announcement.content || 'No content'}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            <div><strong>By:</strong> ${announcement.createdBy?.name || 'Unknown'} (${announcement.createdBy?.role || 'N/A'})</div>
+                            <div><strong>Department:</strong> ${announcement.department || 'all'}</div>
+                            <div><strong>Date:</strong> ${formatDate(announcement.createdAt)}</div>
+                            ${announcement.expiryDate ? `<div><strong>Expires:</strong> ${formatDate(announcement.expiryDate)}</div>` : ''}
                         </div>
-                    ` : ''}
-                </div>
-            </div>
-            <div class="card-body">
-                <p class="card-text">${announcement.content}</p>
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="text-muted small">
-                        <div><strong>By:</strong> ${announcement.createdBy.name} (${announcement.createdBy.role})</div>
-                        <div><strong>Department:</strong> ${announcement.department}</div>
-                        <div><strong>Date:</strong> ${formatDate(announcement.createdAt)}</div>
-                        ${announcement.expiryDate ? `<div><strong>Expires:</strong> ${formatDate(announcement.expiryDate)}</div>` : ''}
-                    </div>
-                    <div class="text-end">
-                        ${announcement.targetAudience.map(audience => 
-                            `<span class="badge bg-info me-1">${audience}</span>`
-                        ).join('')}
+                        <div class="text-end">
+                            ${(announcement.targetAudience || ['all']).map(audience => 
+                                `<span class="badge bg-info me-1">${audience}</span>`
+                            ).join('')}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    `).join('');
-    
-    container.innerHTML = announcementsHtml;
+        `;
+        }).join('');
+        
+        console.log('Generated HTML length:', announcementsHtml.length);
+        container.innerHTML = announcementsHtml;
+        console.log('Announcements displayed successfully');
+        
+    } catch (error) {
+        console.error('Error in displayAnnouncements:', error);
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                Error displaying announcements: ${error.message}
+            </div>
+        `;
+    }
 }
 
 // Get priority color
@@ -161,7 +195,14 @@ function showAnnouncementModal(announcementId = null) {
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="announcementDepartment" class="form-label">Department</label>
-                                        <input type="text" class="form-control" id="announcementDepartment" value="all" required>
+                                        <select class="form-select" id="announcementDepartment" required>
+                                            <option value="all">All Departments</option>
+                                            <option value="Civil Engineering">Civil Engineering</option>
+                                            <option value="Electrical Engineering">Electrical Engineering</option>
+                                            <option value="Electronics and Telecommunications Engineering">Electronics and Telecommunications Engineering</option>
+                                            <option value="Computer Engineering">Computer Engineering</option>
+                                            <option value="Chemical Engineering">Chemical Engineering</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">

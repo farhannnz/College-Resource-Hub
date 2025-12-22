@@ -94,9 +94,29 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
 
+// Serve resources page
+app.get('/resources', (req, res) => {
+  res.sendFile(__dirname + '/public/resources.html');
+});
+
+// Serve announcements page
+app.get('/announcements', (req, res) => {
+  res.sendFile(__dirname + '/public/announcements.html');
+});
+
+// Serve forums page
+app.get('/forums', (req, res) => {
+  res.sendFile(__dirname + '/public/forums.html');
+});
+
 // Serve login page
 app.get('/login', (req, res) => {
   res.sendFile(__dirname + '/public/login.html');
+});
+
+// Serve admin login page
+app.get('/admin-login', (req, res) => {
+  res.sendFile(__dirname + '/public/admin-login.html');
 });
 
 // Serve signup page  

@@ -108,8 +108,8 @@ function updateRoleBasedUI() {
         // Show create post button for all authenticated users
         if (createPostBtn) createPostBtn.style.display = 'inline-block';
         
-        // Show upload button for faculty and admin
-        if ((currentUser.role === 'faculty' || currentUser.role === 'admin') && uploadBtn) {
+        // Show upload button only for admin
+        if (currentUser.role === 'admin' && uploadBtn) {
             uploadBtn.style.display = 'inline-block';
         }
         

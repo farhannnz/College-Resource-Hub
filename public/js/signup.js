@@ -60,8 +60,8 @@ function setupSignupValidation() {
         },
         department: {
             validate: (value) => {
-                if (!value.trim()) return { valid: false, message: 'Department is required' };
-                return { valid: true, message: 'Department looks good!' };
+                if (!value) return { valid: false, message: 'Please select a department' };
+                return { valid: true, message: 'Department selected!' };
             }
         },
         studentId: {
@@ -162,7 +162,7 @@ function setupSignupSubmission() {
             name: document.getElementById('fullName').value.trim(),
             email: document.getElementById('email').value.trim(),
             role: document.getElementById('role').value,
-            department: document.getElementById('department').value.trim(),
+            department: document.getElementById('department').value,
             password: document.getElementById('password').value,
             confirmPassword: document.getElementById('confirmPassword').value,
             agreeTerms: document.getElementById('agreeTerms').checked
@@ -205,8 +205,8 @@ function setupSignupSubmission() {
             console.log('Signup successful:', response);
             
             // Store auth data
-            localStorage.setItem('authToken', response.token);
-            localStorage.setItem('currentUser', JSON.stringify(response.user));
+            localStorage.setItem('token', response.token);
+            localStorage.setItem('user', JSON.stringify(response.user));
             
             // Show success message
             showAlert('success', `Welcome to College Resource Hub, ${response.user.name}!`);

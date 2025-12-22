@@ -18,8 +18,22 @@ router.get('/', async (req, res) => {
       .populate('replies.author', 'name role')
       .sort({ isPinned: -1, createdAt: -1 });
 
-    res.json(posts);
+    // Filter out posts with deleted authors or provide default values
+    const validPosts = posts.map(post => {
+      const postObj = post.toObject();
+      if (!postObj.author) {
+        postObj.author = {
+          name: 'Deleted User',
+          role: 'unknown',
+          department: 'N/A'
+        };
+      }
+      return postObj;
+    });
+
+    res.json(validPosts);
   } catch (error) {
+    console.error('Forums route error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
@@ -64,7 +78,17 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ message: 'Post not found' });
     }
 
-    res.json(post);
+    // Handle deleted author
+    const postObj = post.toObject();
+    if (!postObj.author) {
+      postObj.author = {
+        name: 'Deleted User',
+        role: 'unknown',
+        department: 'N/A'
+      };
+    }
+
+    res.json(postObj);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

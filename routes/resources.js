@@ -56,8 +56,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Upload resource
-router.post('/upload', auth, upload.single('file'), async (req, res) => {
+// Upload resource (admin only)
+router.post('/upload', adminAuth, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });
@@ -76,7 +76,7 @@ router.post('/upload', auth, upload.single('file'), async (req, res) => {
       fileName: req.file.originalname,
       fileSize: req.file.size,
       uploadedBy: req.user._id,
-      isApproved: req.user.role === 'admin' || req.user.role === 'faculty'
+      isApproved: true // Auto-approve since admin is uploading
     });
 
     await resource.save();

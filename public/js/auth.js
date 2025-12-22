@@ -106,7 +106,14 @@ function showRegister() {
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="registerDepartment" class="form-label">Department</label>
-                                        <input type="text" class="form-control" id="registerDepartment" required>
+                                        <select class="form-select" id="registerDepartment" required>
+                                            <option value="">Select Department</option>
+                                            <option value="Civil Engineering">Civil Engineering</option>
+                                            <option value="Electrical Engineering">Electrical Engineering</option>
+                                            <option value="Electronics and Telecommunications Engineering">Electronics and Telecommunications Engineering</option>
+                                            <option value="Computer Engineering">Computer Engineering</option>
+                                            <option value="Chemical Engineering">Chemical Engineering</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>

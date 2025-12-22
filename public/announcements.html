@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcements - College Resource Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-graduation-cap me-2"></i>
+                College Resource Hub
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="resources.html">Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="announcements.html">Announcements</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="forums.html">Forums</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav d-none" id="userNav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i>
+                            <span id="userName"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" id="profileLink">Profile</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="section-title">Announcements</h2>
+                        
+                        <!-- Filters -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <select class="form-select" id="announcementCategoryFilter">
+                                            <option value="">All Categories</option>
+                                            <option value="general">General</option>
+                                            <option value="academic">Academic</option>
+                                            <option value="events">Events</option>
+                                            <option value="urgent">Urgent</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <select class="form-select" id="announcementDepartmentFilter">
+                                            <option value="">All Departments</option>
+                                            <option value="Civil Engineering">Civil Engineering</option>
+                                            <option value="Electrical Engineering">Electrical Engineering</option>
+                                            <option value="Electronics and Telecommunications Engineering">Electronics and Telecommunications</option>
+                                            <option value="Computer Engineering">Computer Engineering</option>
+                                            <option value="Chemical Engineering">Chemical Engineering</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-primary" id="filterAnnouncementsBtn">
+                                            <i class="fas fa-search me-1"></i>Filter
+                                        </button>
+                                        <button class="btn btn-success ms-2" id="createAnnouncementBtn" style="display: none;">
+                                            <i class="fas fa-plus me-1"></i>Create
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Announcements List -->
+                        <div id="announcementsList">
+                            <!-- Dynamic announcements will be loaded here -->
+                        </div>
+
+                        <!-- Static Event Announcements -->
+                        <div class="mt-5">
+                            <h4 class="mb-4 text-primary">
+                                <i class="fas fa-calendar-alt me-2"></i>Upcoming Events
+                            </h4>
+                            
+                            <div class="card announcement-card priority-high mb-3">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <h5 class="card-title mb-0">Annual Technical Fest - TechnoVision 2025</h5>
+                                        <span class="badge bg-warning priority-badge ms-2">HIGH</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-secondary me-2">events</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        Join us for our biggest technical fest of the year! TechnoVision 2025 features coding competitions, 
+                                        robotics challenges, project exhibitions, and guest lectures from industry experts. 
+                                        Register now to participate and showcase your skills!
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="text-muted small">
+                                            <div><strong>Date:</strong> January 15-17, 2025</div>
+                                            <div><strong>Venue:</strong> Main Auditorium & Campus Grounds</div>
+                                            <div><strong>Department:</strong> All Departments</div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-info me-1">all</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card announcement-card priority-medium mb-3">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <h5 class="card-title mb-0">Workshop on Artificial Intelligence & Machine Learning</h5>
+                                        <span class="badge bg-info priority-badge ms-2">MEDIUM</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-secondary me-2">events</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        A comprehensive 3-day workshop on AI/ML fundamentals, neural networks, and practical applications. 
+                                        Industry experts will guide you through hands-on projects. Limited seats available - register early!
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="text-muted small">
+                                            <div><strong>Date:</strong> January 20-22, 2025</div>
+                                            <div><strong>Time:</strong> 10:00 AM - 4:00 PM</div>
+                                            <div><strong>Department:</strong> Computer Engineering</div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-info me-1">students</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card announcement-card priority-medium mb-3">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <h5 class="card-title mb-0">Industry Visit to Manufacturing Plant</h5>
+                                        <span class="badge bg-info priority-badge ms-2">MEDIUM</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-secondary me-2">events</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        Students from Mechanical and Chemical Engineering departments are invited for an educational 
+                                        industry visit to a leading manufacturing plant. Gain practical insights into industrial processes 
+                                        and automation systems.
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="text-muted small">
+                                            <div><strong>Date:</strong> January 25, 2025</div>
+                                            <div><strong>Departure:</strong> 8:00 AM from College Gate</div>
+                                            <div><strong>Department:</strong> Chemical Engineering</div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-info me-1">students</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card announcement-card priority-low mb-3">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <h5 class="card-title mb-0">Sports Day & Cultural Fest</h5>
+                                        <span class="badge bg-secondary priority-badge ms-2">LOW</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-secondary me-2">events</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        Get ready for an exciting day of sports competitions, cultural performances, and fun activities! 
+                                        Participate in cricket, football, basketball, dance, music, and drama competitions. 
+                                        Prizes for winners in each category!
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="text-muted small">
+                                            <div><strong>Date:</strong> February 5, 2025</div>
+                                            <div><strong>Venue:</strong> Sports Ground & Auditorium</div>
+                                            <div><strong>Department:</strong> All Departments</div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-info me-1">all</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5 class="mb-3">
+                        <i class="fas fa-graduation-cap me-2"></i>
+                        College Resource Hub
+                    </h5>
+                    <p class="text-muted">
+                        Your centralized platform for academic resources, announcements, and collaborative learning.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-linkedin fa-lg"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="index.html" class="text-muted text-decoration-none">Home</a></li>
+                        <li class="mb-2"><a href="resources.html" class="text-muted text-decoration-none">Resources</a></li>
+                        <li class="mb-2"><a href="announcements.html" class="text-muted text-decoration-none">Announcements</a></li>
+                        <li class="mb-2"><a href="forums.html" class="text-muted text-decoration-none">Forums</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="mb-3">Contact Us</h5>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            College Campus, City, State
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-phone me-2"></i>
+                            +91 1234567890
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-envelope me-2"></i>
+                            info@college.edu
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4 bg-secondary">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0 text-muted">&copy; 2025 College Resource Hub. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="#" class="text-muted text-decoration-none me-3">Privacy Policy</a>
+                    <a href="#" class="text-muted text-decoration-none">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modals will be added here -->
+    <div id="modalsContainer"></div>
+
+    <!-- Auth Check -->
+    <script>
+        if (!localStorage.getItem('token')) {
+            window.location.href = '/login.html';
+        }
+    </script>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentUser = null;
+        let authToken = null;
+        
+        // Load user data
+        const storedToken = localStorage.getItem('token');
+        const storedUser = localStorage.getItem('user');
+        
+        if (storedToken && storedUser) {
+            authToken = storedToken;
+            currentUser = JSON.parse(storedUser);
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userNav').classList.remove('d-none');
+            
+            // Show create button for faculty and admin
+            if (currentUser.role === 'faculty' || currentUser.role === 'admin') {
+                document.getElementById('createAnnouncementBtn').style.display = 'inline-block';
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+    </script>
+    
+    <script src="js/utils.js"></script>
+    <script src="js/announcements.js"></script>
+    
+    <script>
+        // Load announcements on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAnnouncements();
+            
+            // Setup event listeners
+            document.getElementById('filterAnnouncementsBtn').addEventListener('click', filterAnnouncements);
+            const createBtn = document.getElementById('createAnnouncementBtn');
+            if (createBtn) {
+                createBtn.addEventListener('click', () => showAnnouncementModal());
+            }
+        });
+    </script>
+</body>
+</html>

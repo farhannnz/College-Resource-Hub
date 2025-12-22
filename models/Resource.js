@@ -21,7 +21,8 @@ const resourceSchema = new mongoose.Schema({
   },
   department: {
     type: String,
-    required: true
+    required: true,
+    enum: ['Civil Engineering', 'Electrical Engineering', 'Electronics and Telecommunications Engineering', 'Computer Engineering', 'Chemical Engineering']
   },
   semester: {
     type: String,

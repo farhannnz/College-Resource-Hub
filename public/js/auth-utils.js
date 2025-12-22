@@ -213,8 +213,8 @@ function redirectToApp() {
 
 // Check if user is already logged in
 function checkExistingAuth() {
-    const token = localStorage.getItem('authToken');
-    const user = localStorage.getItem('currentUser');
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
     
     if (token && user) {
         console.log('User already logged in, redirecting...');
