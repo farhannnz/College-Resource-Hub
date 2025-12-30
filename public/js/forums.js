@@ -340,13 +340,6 @@ async function showForumPostModal(postId) {
         showAlert('error', `Failed to load forum post: ${error.message}`);
     }
 }
-                                                    <strong>${reply.author.name}</strong>
-                                                    <span class="badge bg-secondary ms-2">${reply.author.role}</span>
-                                                </div>
-                                                <small class="text-muted">${formatDate(reply.createdAt)}</small>
-                                            </div>
-                                            <p class="mb-2">${reply.content}</p>
-                                            <button class="btn btn-sm btn-outline-primary" onclick="likeReply('${post._id}', '${reply._id}')">
 
 // Handle add reply
 async function handleAddReply(postId) {
