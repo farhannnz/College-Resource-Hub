@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 if (process.env.NODE_ENV === 'production') {
   // Trust proxy for Render
   app.set('trust proxy', 1);
-  
+
   // Compress responses
   const compression = require('compression');
   app.use(compression());
@@ -24,13 +24,13 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: [
-        "'self'", 
+        "'self'",
         "'unsafe-inline'",
         "https://cdn.jsdelivr.net",
         "https://cdnjs.cloudflare.com"
       ],
       scriptSrc: [
-        "'self'", 
+        "'self'",
         "'unsafe-inline'",
         "https://cdn.jsdelivr.net",
         "https://cdnjs.cloudflare.com"
@@ -130,12 +130,12 @@ app.get('*', (req, res) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ message: 'API endpoint not found' });
   }
-  
+
   // Serve static files if they exist
   if (req.path.includes('.')) {
     return res.status(404).send('File not found');
   }
-  
+
   // For all other routes, serve index.html (SPA behavior)
   res.sendFile(__dirname + '/public/index.html');
 });
@@ -147,5 +147,11 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log('\n🚀 Server is running!');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log(`📍 Local:            http://localhost:${PORT}`);
+  console.log(`🌐 Network:          http://127.0.0.1:${PORT}`);
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('📚 College Resource Hub');
+  console.log('✨ Press Ctrl+C to stop the server\n');
 });

@@ -130,6 +130,19 @@ function getPriorityColor(priority) {
 // Filter announcements
 function filterAnnouncements() {
     loadAnnouncements();
+    
+    // Also filter static events
+    const categoryFilter = document.getElementById('announcementCategoryFilter')?.value;
+    const staticEventsSection = document.getElementById('staticEventsSection');
+    
+    if (staticEventsSection) {
+        // If "events" category is selected or no filter, show static events
+        if (!categoryFilter || categoryFilter === 'events') {
+            staticEventsSection.style.display = 'block';
+        } else {
+            staticEventsSection.style.display = 'none';
+        }
+    }
 }
 
 // Show announcement modal
